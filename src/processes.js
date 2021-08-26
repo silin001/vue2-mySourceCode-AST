@@ -1,3 +1,4 @@
+// 处理属性
 import {
   getAndRemoveAttr,
   getBindingAttr,
@@ -18,7 +19,7 @@ const modifierRE = /\.[^.]+/g;
  * 解析v-for属性
  * @param el
  */
-export function processFor(el) {
+export function processFor (el) {
   const exp = getAndRemoveAttr(el, 'v-for');
   if (exp) {
     const inMatch = exp.match(forAliasRE);
@@ -46,7 +47,7 @@ export function processFor(el) {
  * 解析v-if属性
  * @param el
  */
-export function processIf(el) {
+export function processIf (el) {
   const exp = getAndRemoveAttr(el, 'v-if');
   if (exp) {
     el.if = exp;
@@ -69,14 +70,14 @@ export function processIf(el) {
  * 解析 v-once 属性
  * @param el
  */
-export function processOnce(el) {
+export function processOnce (el) {
   const once = getAndRemoveAttr(el, 'v-once');
   if (once != null) {
     el.once = true
   }
 }
 
-export function processElement(el) {
+export function processElement (el) {
   processKey(el);
   // 去掉属性后，确定这是一个普通元素。
   el.plain = !el.key && !el.attrsList.length;
@@ -128,7 +129,7 @@ export function addAttr (el, name, value) {
  * 处理元素的唯一标识key
  * @param el
  */
-function processKey(el) {
+function processKey (el) {
   const exp = getBindingAttr(el, 'key');
   if (exp) {
     el.key = exp;
@@ -139,7 +140,7 @@ function processKey(el) {
  * 处理ref
  * @param el
  */
-function processRef(el) {
+function processRef (el) {
   const ref = getBindingAttr(el, 'ref');
   if (ref) {
     el.ref = ref;
@@ -156,7 +157,7 @@ function processRef(el) {
  * 两种情况
  * @param el
  */
-function processSlot(el) {
+function processSlot (el) {
   if (el.tag === 'slot') {
     el.slotName = getBindingAttr(el, 'name');
   } else {
@@ -176,7 +177,7 @@ function processSlot(el) {
  * :is 动态引入模板的功能，其实我们用vue-cli 脚手架搭的环境用template更好
  * @param el
  */
-function processComponent(el) {
+function processComponent (el) {
   let binding;
   if ((binding = getBindingAttr(el, 'is'))) {
     el.component = binding;
@@ -191,7 +192,7 @@ function processComponent(el) {
  * 根据正则判断不同类型进行不同处理
  * @param el
  */
-function processAttrs(el) {
+function processAttrs (el) {
   const list = el.attrsList;
   let i, l, name, rawName, value, modifiers, isProp;
   for (i = 0, l = list.length; i < l; i++) {
@@ -225,7 +226,7 @@ function processAttrs(el) {
  * @param children
  * @returns {*}
  */
-function findPrevElement(children) {
+function findPrevElement (children) {
   let i = children.length;
   while (i--) {
     if (children[i].type === 1) {
@@ -242,7 +243,7 @@ function findPrevElement(children) {
  * @param el
  * @returns {boolean}
  */
-function checkInFor(el) {
+function checkInFor (el) {
   let parent = el;
   while (parent) {
     if (parent.for !== undefined) {

@@ -7,3 +7,5 @@ npm install
 npm run build
 // 然后选择index.html文件运行查看效果
 ```
+# 总结：
+1. AST抽象语法树实现原理基于 指针思想+栈算法

@@ -9,7 +9,7 @@ const reCache = {};
 // 特殊标签
 const isPlainTextElement = (tag) => ('script,style,textarea').indexOf(tag) >= 0;
 
-export function parseHTML(html, options) {
+export function parseHTML (html, options) {
   const stack = [];
   let index = 0;
   let last, lastTag;
@@ -17,7 +17,7 @@ export function parseHTML(html, options) {
   while (html) {
     last = html;
     // 处理非script,style,textarea的元素
-    if(!lastTag || !isPlainTextElement(lastTag)) {
+    if (!lastTag || !isPlainTextElement(lastTag)) {
       let textEnd = html.indexOf('<');
       if (textEnd === 0) {
         // 结束标签
@@ -57,7 +57,7 @@ export function parseHTML(html, options) {
       // 缓存匹配textarea 的正则表达式
       const reStackedTag = reCache[stackedTag] || (reCache[stackedTag] = new RegExp('([\\s\\S]*?)(</' + stackedTag + '[^>]*>)', 'i'));
       // 清除匹配项，处理text
-      const rest = html.replace(reStackedTag, function(all, text, endTag) {
+      const rest = html.replace(reStackedTag, function (all, text, endTag) {
         endTagLength = endTag.length;
         options.chars(text);
         return ''
@@ -67,12 +67,12 @@ export function parseHTML(html, options) {
       parseEndTag(stackedTag, index - endTagLength, index);
     }
   }
-
   /**
+   * 解析开始标签
    * 处理解析后的属性，重新分割并保存到attrs数组中
    * @param match
    */
-  function handleStartTag(match) {
+  function handleStartTag (match) {
     const tagName = match.tagName;
     const unary = isUnaryTag(tagName) || !!match.unarySlash;
     const l = match.attrs.length;
@@ -80,7 +80,7 @@ export function parseHTML(html, options) {
     for (let i = 0; i < l; i += 1) {
       const args = match.attrs[i];
       attrs[i] = {
-        name:args[1], // 属性名
+        name: args[1], // 属性名
         value: args[3] || args[4] || args[5] || '' // 属性值
       };
     }
@@ -100,11 +100,13 @@ export function parseHTML(html, options) {
     options.start(tagName, attrs, unary, match.start, match.end);
   }
 
+
   /**
+   * 开始标签
    * 匹配到元素的名字和属性，保存到match对象中并返回
    * @returns {{tagName: *, attrs: Array, start: number}}
    */
-  function parseStartTag() {
+  function parseStartTag () {
     const start = html.match(startTagOpen);
     if (start) {
       // 定义解析开始标签的存储格式
@@ -141,11 +143,11 @@ export function parseHTML(html, options) {
    * @param start
    * @param end
    */
-  function parseEndTag(tagName, start, end) {
+  function parseEndTag (tagName, start, end) {
     const lowerCasedTag = tagName && tagName.toLowerCase();
     let pos = 0;
     if (lowerCasedTag) {
-      for (pos = stack.length -1; pos >= 0; pos -= 1) {
+      for (pos = stack.length - 1; pos >= 0; pos -= 1) {
         if (stack[pos].lowerCasedTag === lowerCasedTag) {
           break;
         }
@@ -167,7 +169,7 @@ export function parseHTML(html, options) {
    * 删除html 字符串
    * @param n 从哪里开始取字符串
    */
-  function advance(n) {
+  function advance (n) {
     index += n;
     html = html.substring(n);
   }
@@ -179,7 +181,7 @@ export function parseHTML(html, options) {
  * @param tagName
  * @returns {boolean}
  */
-function isUnaryTag(tagName) {
+function isUnaryTag (tagName) {
   const str = 'area,base,br,col,embed,frame,hr,img,input,isindex,keygen,' +
     'link,meta,param,source,track,wbr';
   const list = str.split(',');

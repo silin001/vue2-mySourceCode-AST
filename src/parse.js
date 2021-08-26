@@ -1,5 +1,15 @@
+/*
+ast解析
+
+我们知道HTML模板是有标签、文本、注释组成的，这里不考虑注释，而标签又分为单元素标签（如：img，br 等）和普通标签（如： div， table 等）。文本又分为带有绑定的文本（含有{{}} 双大括号）和普通文本（不含有{{}} 双大括号）。
+所以解析HTML最少要分两个方法，一个处理标签，一个处理文本，但是无论单元素还是普通标签都有开始和闭合，只是形式不一样罢了。所以把解析HTML 可以分成start（处理开始标签）、end（处理结束标签）、char（处理文本）：
+*/
+
+// 
+// parseHTML: 用正则匹配的方式，逐一循环HTML字符串，分类不同匹配项，保存最基本的tagName（标签名），attrs（属性），此时属性并没有区分是内置属性还是普通属性，只是简单的分隔了属性名和属性值。从函数名中可以看到加了HTML
 import { parseHTML } from "./html-parser";
 import { parseText } from "./parse-text";
+// 处理指令
 import {
   processFor,
   processIf,
@@ -9,8 +19,11 @@ import {
   addIfCondition
 } from './processes';
 
-export function parse(template, options) {
+// ⭐ parse： 从parseHTML解析的基本属性数组中重新解析，区分不同属性做不同处理，普通属性与内置属性处理方式是不一样的。并且判断该元素是在哪个位置，也就是确定该元素的父节点、兄弟节点、子节点，最终形成ast。
+// 实现原理： 指针思想+栈
+export function parse (template, options) {
   // 暂存没有闭合的标签元素基本信息， 当找到闭合标签后清除存在于stack里面的元素
+  // stack  栈算法实现
   const stack = [];
   // 这里就是解析后的最终数据，这里主要应用了引用类型的特性，最终使root滚雪球一样，保存标签的所有信息
   let root;
@@ -23,9 +36,9 @@ export function parse(template, options) {
      * @param attrs 元素属性
      * @param unary 该元素是否单元素， 如img
      */
-    start(tag, attrs, unary) {
+    start (tag, attrs, unary) {
       // 创建ast容器
-      let element = createASTElement(tag,attrs, currentParent);
+      let element = createASTElement(tag, attrs, currentParent);
 
       // 下面是加工、处理各种Vue支持的内置属性和普通属性
       processFor(element);
@@ -65,7 +78,7 @@ export function parse(template, options) {
     /**
      * 闭合元素，更新stack和currentParent
      */
-    end() {
+    end () {
       // 取出stack中最后一个元素，其实这也是需要闭合元素的开始标签，如</div> 的开始标签就是<div>
       // 此时取出的element包含该元素的所有信息，包括他的子元素信息
       const element = stack[stack.length - 1];
@@ -90,7 +103,7 @@ export function parse(template, options) {
      * 处理文本和{{}}
      * @param text 文本内容
      */
-    chars(text) {
+    chars (text) {
       // 如果是文本，没有父节点，直接返回
       if (!currentParent) {
         return;
@@ -109,7 +122,7 @@ export function parse(template, options) {
             expression,
             text,
           });
-       } else if (text !== ' ' || !children.length || children[children.length - 1].text !== ' ') {
+        } else if (text !== ' ' || !children.length || children[children.length - 1].text !== ' ') {
           children.push({
             type: 3,
             text,
@@ -119,6 +132,7 @@ export function parse(template, options) {
     },
   });
   // 把解析后返回出去，这个就是ast(抽象语法树)
+  console.log(root)
   return root;
 }
 
@@ -129,7 +143,7 @@ export function parse(template, options) {
  * @param parent
  * @returns {{type: number, tag: *, attrsList: *, attrsMap, parent: *, children: Array}}
  */
-function createASTElement(tag, attrs, parent) {
+function createASTElement (tag, attrs, parent) {
   return {
     type: 1,
     tag,
